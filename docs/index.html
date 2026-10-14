@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sysreport</title>
+<meta name="description" content="Quick health check for a Linux workstation: updates, CVEs, firewall, snapshots, disk space and more.">
+<style>
+  :root {
+    --bg: #0f0a0c; --panel: #17101300; --card: #1b1215; --line: #2e2025;
+    --text: #e8dcd8; --muted: #a8968f; --accent: #c8304e; --ok: #7fbf7f; --warn: #e0b45a;
+    --mono: ui-monospace, "JetBrains Mono", "CaskaydiaCove Nerd Font Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Cantarell, Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--sans); }
+  main { max-width: 860px; margin: 0 auto; padding: 56px 20px 72px; }
+  header h1 { font: 700 2.4rem/1.1 var(--mono); margin: 0 0 8px; letter-spacing: -0.02em; }
+  header h1 span { color: var(--accent); }
+  header p { color: var(--muted); margin: 0 0 28px; font-size: 1.1rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 40px; }
+  .btn { display: inline-block; padding: 10px 18px; border-radius: 8px; text-decoration: none;
+         font-weight: 600; border: 1px solid var(--line); color: var(--text); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn:hover { filter: brightness(1.12); }
+  h2 { font: 600 1.15rem var(--mono); color: var(--accent); margin: 44px 0 12px; }
+  .term { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
+  .term .bar { padding: 8px 12px; border-bottom: 1px solid var(--line); color: var(--muted); font: 13px var(--mono); }
+  pre { margin: 0; padding: 16px; font: 13.5px/1.5 var(--mono); white-space: pre; }
+  .ok { color: var(--ok); } .warn { color: var(--warn); } .dim { color: var(--muted); }
+  code { font-family: var(--mono); background: var(--card); border: 1px solid var(--line);
+         padding: 1px 6px; border-radius: 5px; font-size: 0.92em; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .card b { display: block; font-family: var(--mono); margin-bottom: 2px; }
+  .card span { color: var(--muted); font-size: 0.93rem; }
+  ul { padding-left: 20px; } li { margin: 4px 0; }
+  footer { margin-top: 56px; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); padding-top: 18px; }
+  footer a, main a:not(.btn) { color: var(--text); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1><span>$</span> sysreport</h1>
+    <p>Quick health check for a Linux workstation, with an optional guided fix mode.</p>
+    <div class="actions">
+      <a class="btn primary" href="#install">Install</a>
+      <a class="btn" href="https://github.com/lounesart/sysreport">Source on GitHub</a>
+    </div>
+  </header>
+
+  <div class="term">
+    <div class="bar">~ ❯ sysreport</div>
+<pre>
+ Check            Status   Details
+ Pending updates  <span class="warn">▲ warn</span>   <span class="warn">4 update(s) available</span>
+ Fixable CVEs     <span class="ok">✔ ok</span>     <span class="ok">no vulnerabilities fixable by updating</span>
+ Failed services  <span class="ok">✔ ok</span>     <span class="ok">none</span>
+ Firewall         <span class="ok">✔ ok</span>     <span class="ok">nftables enabled at boot</span>
+ Snapshots        <span class="ok">✔ ok</span>     <span class="ok">20 snapshot(s), newest 0 day(s) old</span>
+ Disk space /     <span class="ok">✔ ok</span>     <span class="ok">15% used, 106 GB free</span>
+ AppArmor         <span class="ok">✔ ok</span>     <span class="ok">enabled</span>
+ USBGuard         <span class="ok">✔ ok</span>     <span class="ok">active, no blocked devices</span>
+ Clock sync       <span class="ok">✔ ok</span>     <span class="ok">synchronized</span>
+ Errors this boot <span class="warn">▲ warn</span>   <span class="warn">8 error message(s)</span>
+
+ <span class="ok">8 ok</span> · <span class="warn">2 warn</span> · 0 fail · <span class="dim">0 skipped</span>
+</pre>
+  </div>
+
+  <h2 id="install">install</h2>
+  <p>Needs Python 3.11+ and <a href="https://docs.astral.sh/uv/">uv</a>.</p>
+  <div class="term"><pre>uv tool install git+https://github.com/lounesart/sysreport</pre></div>
+
+  <h2>usage</h2>
+  <div class="term"><pre>sysreport            <span class="dim"># the table</span>
+sysreport --explain  <span class="dim"># what's wrong and how to fix it</span>
+sysreport --fix      <span class="dim"># fix things one command at a time</span>
+sysreport --json     <span class="dim"># JSON for scripts</span></pre></div>
+  <p>Exit codes: <code>0</code> ok, <code>1</code> warnings, <code>2</code> failures.</p>
+
+  <h2>--fix</h2>
+  <p>For each problem it explains what's going on, then shows the fix commands one at a time with a note on what each one does. You choose run, skip or quit every time. Skip is the default. Afterwards it re-runs the check so you can see if it worked.</p>
+  <div class="term"><div class="bar">~ ❯ sysreport --fix</div>
+<pre>Step 2/2 <span class="warn">[change]</span> <span style="color:#c8304e">(needs your password)</span>
+  <span class="ok">$ sudo pacman -Syu</span>
+  What: Syncs package databases (-y) and upgrades every installed package (-u).
+  Why:  This is the only supported way to update Arch.
+  Run this command? [r/s/q] (s): <span class="dim">█</span></pre></div>
+  <p>It won't allow USB devices or touch kernel boot parameters for you. For those it just explains the steps.</p>
+
+  <h2>checks</h2>
+  <div class="grid">
+    <div class="card"><b>Updates, CVEs</b><span>checkupdates, arch-audit</span></div>
+    <div class="card"><b>Failed services</b><span>systemd units in failed state</span></div>
+    <div class="card"><b>Firewall</b><span>nftables, ufw or firewalld</span></div>
+    <div class="card"><b>Snapshots</b><span>snapper root config</span></div>
+    <div class="card"><b>Disk space</b><span>warn at 80%, fail at 90%</span></div>
+    <div class="card"><b>AppArmor, USBGuard</b><span>enabled, blocked devices</span></div>
+    <div class="card"><b>Clock sync</b><span>NTP status</span></div>
+    <div class="card"><b>Boot errors</b><span>journalctl -p 3</span></div>
+  </div>
+  <p>Runs as your user, no root. Checks whose tools aren't installed are skipped.</p>
+
+  <footer>MIT license · <a href="https://github.com/lounesart">lounesart</a></footer>
+</main>
+</body>
+</html>

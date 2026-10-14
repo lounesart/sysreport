@@ -1,0 +1,25 @@
+[project]
+name = "sysreport"
+version = "0.2.0"
+description = "Quick health check for a Linux workstation"
+readme = "README.md"
+authors = [
+    { name = "lounesart", email = "141259710+lounesart@users.noreply.github.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "rich>=15.0.0",
+]
+
+[project.scripts]
+sysreport = "sysreport:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.17.0",
+]
